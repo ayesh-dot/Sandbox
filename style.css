@@ -1,0 +1,632 @@
+/* ==========================================================================
+    1. MODERN CSS RESET (Ensures consistency across Chrome, Safari, Firefox)
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+/* ==========================================================================
+   2. GLOBAL VARIABLES & THEME
+   ========================================================================== */
+:root {
+    --bg-primary: #f4f6f9;
+    --surface-card: #ffffff;
+    
+    
+    --color-primary: #1a73e8;       
+    --color-primary-hover: #1557b0;
+    --color-success: #0f9d58;       
+    --color-text-main: #202124;
+    --color-text-muted: #5f6368;
+    --color-border: #dadce0;
+
+    
+    --radius-md: 12px;
+    --radius-sm: 6px;
+    --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   3. BASE STYLES
+   ========================================================================== */
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--color-text-main);
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+
+.hidden {
+    display: none !important;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: 1.5rem 0;
+}
+
+/* ==========================================================================
+   4. COMPONENTS (The Main App UI)
+   ========================================================================== */
+
+
+.card {
+    background: var(--surface-card);
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.card h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+
+button {
+    width: 100%;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+
+button.secondary-btn {
+    background-color: #f1f3f4;
+    color: var(--color-text-main);
+    margin-top: 1.5rem;
+}
+
+button.secondary-btn:hover {
+    background-color: #e8eaed;
+}
+
+
+.profile-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin: 0 auto 1rem auto;
+    border: 3px solid white;
+    box-shadow: var(--shadow-subtle);
+}
+
+#user-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   5. FUTURE DASHBOARD SKELETON (Ready for your bank features)
+   ========================================================================== */
+.balance-display {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-success);
+    margin: 1rem 0;
+}
+
+.balance-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+}
+
+.dob-inputs{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.dob-inputs input{    
+    width: 50px;
+    padding-left: 5px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px; 
+}
+
+#day-input{
+    width: 46px;
+
+}
+
+#month-input{
+    width: 53px;
+
+}
+#year-input{
+    width: 65px;
+
+}
+
+.margin10px{
+    margin: 10px 10px;
+}
+
+.first-name, .last-name{
+    border-radius: 5px;
+    border : 1px solid var(--color-border);
+    width: 70%;
+}
+.name-inputs{
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: 5px;
+
+}
+
+
+.additional-info{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.additional-info input {
+    display:flex;
+    flex-direction: column;
+    width: 85%;
+    padding-left: 7px;
+}
+#cvv-box, #phone-number{
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+
+}
+
+.name-inputs input{
+    padding-left: 7px;
+}
+
+
+.debit-card-container {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+
+.debit-card-visual {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    position: relative;
+    box-shadow: 0 6px 12px rgba(42, 82, 152, 0.3);
+}
+
+
+.card-chip {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.card-number-display {
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-family: sans-serif;
+}
+
+.label {
+    display: block;
+    font-size: 0.65rem;
+    color: #cbd5e1;
+    margin-bottom: 2px;
+}
+
+
+.card-divider {
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 20px 0;
+}
+
+
+.account-details-dropdown {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.dropdown-trigger {
+    padding: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none; 
+}
+
+.dropdown-trigger::-webkit-details-marker {
+    display: none; 
+}
+
+
+.account-details-dropdown[open] .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    padding: 12px;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 0.9rem;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #f1f5f9;
+}
+
+.meta-row:last-child {
+    border-bottom: none;
+}
+
+
+.transaction-card-container {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-top: 20px; 
+}
+
+
+.transaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.transaction-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #1e293b;
+}
+
+.ledger-badge {
+    font-size: 0.75rem;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+
+.ledger-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 5px;
+}
+
+.stat-box {
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-box.income {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.stat-box.expenses {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.stat-box span:last-child {
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+
+.history-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.history-controls h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+.history-count {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+
+.transaction-log-list {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+
+.tx-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #ffffff;
+    transition: background 0.2s;
+}
+
+.tx-row:last-child {
+    border-bottom: none;
+}
+
+.tx-row:hover {
+    background: #f8fafc;
+}
+
+.tx-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tx-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.tx-date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.tx-amount {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+
+.tx-amount.deposit { color: #16a34a; }
+.tx-amount.withdrawal { color: #dc2626; }
+
+
+.empty-log-placeholder {
+    padding: 40px 20px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.placeholder-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.empty-log-placeholder p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   STARK FINTECH SECURITY VAULT TRIGGER
+   ========================================================================== */
+.reveal-data-btn {
+    background-color: #ccccccb7;  
+    color: #ffffff;             
+    border: 2px solid #1e293b81;  
+    border-radius: 4px;         
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;  
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    font-family: monospace;     
+    
+    
+    display: inline-flex;
+    align-items: center;        
+    justify-content: center;    
+    gap: 8px;                   
+    
+    min-width: 130px;           
+    transition: all 0.15s ease-in-out;
+}
+
+
+.reveal-data-btn:hover {
+    background-color: #111827;  
+    border-color: #000000;      
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+}
+
+
+.reveal-data-btn.unlocked-state {
+    background-color: #991b1b;  
+    color: #ffffff;
+    border-color: #7f1d1d;
+}
+
+.reveal-data-btn.unlocked-state:hover {
+    background-color: #7f1d1d;  
+    border-color: #991b1b;
+}
+
+
+.reveal-data-btn:active {
+    transform: scale(0.97);
+}
+
+.reveal-data-btn:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+.secondary-btn, #logout-btn, button[id*="reveal"] {
+    background-color: #e9ecef;
+    color: #212529 !important; 
+    font-weight: 600;          
+}
+
+#transfer-form input {
+    background-color: #ffffff; 
+    color: #212529 !important; 
+    border: 1px solid #ced4da; 
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;    
+}
+
+
+#transfer-form input::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+#crypto-auth-modal {
+    
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0; 
+
+    
+    background: #ffffff;
+    color: #333333;
+    border: none;
+    border-radius: 8px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+
+#crypto-auth-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px); 
+}
+
+
+#security-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #cbd5e1; 
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+
+#status-emoji {
+    color: #ef4444; 
+}
+
+
+.is-secure #status-emoji {
+    color: #10b981; 
+}
+
+#security-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}

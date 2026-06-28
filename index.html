@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Sandbox || Payment Gateway API Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <button id="security-btn" style="position: absolute; top: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #cbd5e1; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+        <span id="status-emoji" style="font-size: 24px; font-weight: bold; color: #ef4444;">&times;</span>
+    </button>
+
+    <dialog id="upload-modal" style="padding: 20px; border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3>Load Security Key</h3>
+        <p>Upload your .json file to authorize this session.</p>
+        <input type="file" id="json-input" accept=".json">
+        <br><br>
+        <button onclick="document.getElementById('upload-modal').close()">Cancel</button>
+    </dialog>
+
+    <!-- Main content section -->
+    <div style="flex-direction: column;">
+        <main class="card" id="main-card" style="padding-left: 100px; padding-right: 100px; margin-bottom: 20px">
+            <h1>📦 Sandbox</h1>
+            <hr>
+
+            <div id="logged-out-view">
+                <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">
+                    Welcome. Please sign in to manage your mock accounts and generate test payment cards.
+                </p>
+                <button id="login-btn">Sign in with Google</button>
+            </div>
+
+            
+
+            
+
+            <div id="logged-in-view" class="hidden">
+                <img id="user-photo" class="profile-img" src="" alt="User profile">
+                <h3 id="user-name">Welcome back</h3>
+                <p id="user-email" style="color: var(--color-text-muted); font-size: 0.9rem;"></p>
+                
+                <hr>
+                
+                <div id="dashboard-content">
+                    <p class="balance-label">Available Balance</p>
+                    <p class="balance-display">$1,000.00</p>
+                    
+                    </div>
+
+                <button id="logout-btn" class="secondary-btn">Sign Out</button>
+            </div>
+        </main>
+
+        <div class="card" id="transfers-dashboard">
+            <h2>Transfers</h2>
+            
+            <form id="transfer-form" onsubmit="return false;">
+                <div class="input-group" style="margin-top: 15px; margin-bottom: 15px;">
+                    <label for="transfer-recipient" style="display: block; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 5px;">Recipient Email / Alias</label>
+                    <input type="email" id="transfer-recipient" placeholder="username@gmail.com" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--color-border); background: transparent; color: white;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label for="transfer-amount" style="display: block; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 5px;">Amount ($)</label>
+                    <input type="number" id="transfer-amount" step="0.01" min="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--color-border); background: transparent; color: white;">
+                </div>
+
+                <button id="send-transfer-btn" class="secondary-btn" style="width: 100%; padding: 12px; font-weight: bold; cursor: pointer;">
+                    Confirm & Send Funds
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+
+    <!-- VERTICAL STACK SECTION -->
+
+
+        <div style="flex-direction: column;">
+            <div class="card debit-card-container" id="debit-card-dashboard">
+            
+                <div class="debit-card-visual">
+                    <div class="card-chip"></div>
+                    <div class="card-number-display">4783 92•• •••• ••••</div>
+                    
+                    <div class="card-footer">
+                        <div class="card-holder">
+                            <span class="label">CARDHOLDER</span>
+                            <span id="ui-card-name">LOADING NAME...</span>
+                        </div>
+                        <div class="card-cvv">
+                            <span class="label">CVV</span>
+                            <span id="ui-card-cvv">•••</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="card-divider">
+
+                <button id="revealer" class="reveal-data-btn">Reveal Metadata</button>
+
+            </div>
+
+
+
+            <!-- TRANSACTION HISTORY CARD -->
+
+
+            <div class="card transaction-card-container" id="ledger-dashboard">
+    
+                <div class="transaction-header">
+                    <h3>Account Ledger</h3>
+                    <span class="ledger-badge">Live Sync</span>
+                </div>
+
+                <div class="ledger-stats-grid">
+                    <div class="stat-box income">
+                        <span class="stat-label">Total Inflow</span>
+                        <span id="ui-total-inflow">+$100.00</span>
+                    </div>
+                    <div class="stat-box expenses">
+                        <span class="stat-label">Total Outflow</span>
+                        <span id="ui-total-outflow">-$0.00</span>
+                    </div>
+                </div>
+
+                <hr class="card-divider">
+
+                <div class="history-section">
+                    <div class="history-controls">
+                        <h4>Recent Transactions</h4>
+                        <span class="history-count" id="ui-tx-count">0 items</span>
+                    </div>
+
+                    <div class="transaction-log-list" id="ui-transaction-log">
+                        <div class="empty-log-placeholder" id="ui-empty-log">
+                            <div class="placeholder-icon">📋</div>
+                            <p>No account activity recorded yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="card" style="margin-top: 18px; padding: 16px 20px;" id="card-config-dashboard">
+                <h3 style="font-size: 1rem; font-weight: 700; color: #212529; margin-bottom: 12px; border-bottom: 1px solid #e9ecef; padding-bottom: 8px;">
+                    ⚙️ Card Configuration
+                </h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="font-size: 0.85rem; font-weight: 500; color: #495057; padding-right: 5px !important;">Material Texture:</label>
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                            <button onclick="changeCardSkin('classic')" style="display: block; width: 22px; height: 22px; min-width: 22px; min-height: 22px; border-radius: 50%; background: #1e3c72; border: 2px solid #fff; box-shadow: 0 0 0 1px #ced4da; cursor: pointer; padding: 0; margin: 0; box-sizing: border-box;" title="Midnight Steel"></button>
+                            <button onclick="changeCardSkin('matte-black')" style="display: block; width: 22px; height: 22px; min-width: 22px; min-height: 22px; border-radius: 50%; background: #1a1a1a; border: 2px solid #fff; box-shadow: 0 0 0 1px #ced4da; cursor: pointer; padding: 0; margin: 0; box-sizing: border-box;" title="Matte Carbon"></button>
+                            <button onclick="changeCardSkin('frosted-emerald')" style="width: 22px; height: 22px; min-width: 22px; min-height: 22px; border-radius: 50%; background: #0f5132; border: 2px solid #fff; box-shadow: 0 0 0 1px #ced4da; cursor: pointer; padding: 0; margin: 0; box-sizing: border-box;" title="Frosted Emerald"></button>
+                            <button onclick="changeCardSkin('brushed-gold')" style="display: block; width: 22px; height: 22px; min-width: 22px; min-height: 22px; border-radius: 50%; background: linear-gradient(135deg, #bf953f, #fcf6ba); border: 2px solid #fff; box-shadow: 0 0 0 1px #ced4da; cursor: pointer; padding: 0; margin: 0; box-sizing: border-box;" title="Brushed Gold"></button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="card-tier-select" style="font-size: 0.85rem; font-weight: 500; color: #495057;">Issuing Tier Network:</label>
+                        <select id="card-tier-select" onchange="updateCardTier(this.value)" style="width: 100%; font-size: 0.85rem; padding: 6px 10px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; color: #212529; cursor: pointer; font-weight: 500; box-sizing: border-box;">
+                            <option value="STANDARD NET">Standard Network</option>
+                            <option value="PREMIER BLACK">Premier Black</option>
+                            <option value="PLATINUM PRIVÉ">Platinum Privé</option>
+                        </select>
+                    </div>
+
+                    <div style="height:25px;"></div>
+                </div>
+            </div>
+
+        </div>
+
+    <!-- VERTICAL STACK END -->
+
+
+        
+    <div class="card hidden" id="create-account-card">
+        <!-- Create Account Section: Created by Abdallah Alkhader under the supervision of Ayesh Abulehieh -->
+
+        <h1>Create Your Account</h1>
+
+        <div id="create-account-view" style="margin-top: 10px;">
+
+            <label>Name</label>
+            <div class="name-inputs">
+                <input type="text"  placeholder=" Enter First Name" class="first-name" id="first-name-input"  oninput="this.value = this.value.replace(/[0-9]/g, '');">
+                <input type="text"  placeholder=" Enter Last Name" class="last-name" id="last-name-input"  oninput="this.value = this.value.replace(/[0-9]/g, '');">
+            </div>
+
+
+
+            <label>Date of Birth</label>
+            <div class="dob-inputs margin10px">
+                
+                <input 
+                    type="number" 
+                    placeholder="DD" 
+                    id="day-input" 
+                    oninput="
+                        if(this.value.length > 2) this.value = this.value.slice(0, 2);
+                        let m = parseInt(document.getElementById('month-input').value, 10);
+                        let y = parseInt(document.getElementById('year-input').value, 10);
+                        let max = (m && y && document.getElementById('year-input').value.length === 4) ? new Date(y, m, 0).getDate() : (m ? [31,28,31,30,31,30,31,31,30,31,30,31][m-1] : 31);
+                        if(parseInt(this.value, 10) > max) this.value = '';
+                        if(this.value <0){
+                            this.value = '';
+                        }else if(this.value == 0){
+                            this.value = 1;
+                        }
+                    "
+                >
+                
+                <input 
+                    type="number" 
+                    placeholder="MM" 
+                    id="month-input" 
+                    oninput="
+                        if(this.value.length > 2) this.value = this.value.slice(0, 2);
+                        if(parseInt(this.value, 10) > 12) this.value = '';
+                        let d = document.getElementById('day-input');
+                        let y = parseInt(document.getElementById('year-input').value, 10);
+                        let m = parseInt(this.value, 10);
+                        let max = (m && y && document.getElementById('year-input').value.length === 4) ? new Date(y, m, 0).getDate() : (m ? [31,28,31,30,31,30,31,31,30,31,30,31][m-1] : 31);
+                        if(parseInt(d.value, 10) > max) d.value = '';
+                        if(this.value < 0){
+                            this.value = '';
+                        } else if(this.value == 0){
+                            this.value = 1;
+                        }
+                    "
+                >
+
+                <input 
+                    type="number" 
+                    placeholder="YYYY" 
+                    id="year-input" 
+                    oninput="
+                        if(this.value.length > 4) this.value = this.value.slice(0, 4);
+                        let d = document.getElementById('day-input');
+                        let m = parseInt(document.getElementById('month-input').value, 10);
+                        let y = parseInt(this.value, 10);
+                        if(m && y && this.value.length === 4) {
+                            let max = new Date(y, m, 0).getDate();
+                            if(parseInt(d.value, 10) > max) d.value = '';
+                        }
+                        if(this.value > new Date().getFullYear()- 16 || this.value < 0){
+                            this.value = '';
+                        }else if(this.value == 0){
+                            this.value = 1;
+                        }
+                    "
+                >
+            
+            </div>
+
+            
+            <div class="additional-info">
+                <label>Additional Information</label>
+                <input
+                 type="number" 
+                 id="cvv-box" 
+                 maxlength="3" 
+                 placeholder=" Choose a CVV For Your Debit card" 
+                 class="margin10px"
+                 oninput="
+                 if(this.value > 999){
+                    this.value = '';
+                    
+                 }
+                    "
+                >
+                <input id="phone-number" type="tel" maxlength="10" placeholder=" Enter Your Phone number (+962 JO)">
+                <button id="create-account-button" class="margin10px">Create</button>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <div id="sms-verification-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+    
+        <div style="background: #ffffff; border-radius: 16px; width: 90%; max-width: 420px; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); text-align: center; border: 1px solid #e2e8f0; position: relative; margin: 12% auto;">
+            
+            <div style="position: absolute; top: 0; left: 0; width: 97%; height: 6px; background: linear-gradient(90deg, #10b981, #059669); border-top-left-radius: 16px; border-top-right-radius: 16px; margin-left: 7px; margin-top: 5px;"></div>
+
+            <h3 style="color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 8px; margin-top: 8px;">Security Verification</h3>
+            <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin-bottom: 24px; padding: 0 10px;">A 6-digit dynamic authorization PIN has been broadcasted to your verified mobile device to confirm this transfer.</p>
+
+            <div style="margin-bottom: 28px;">
+                <input type="text" id="sms-code-input" maxlength="6" placeholder="000000" autocomplete="off" 
+                    style="width: 85%; padding: 12px; font-size: 28px; font-weight: 700; letter-spacing: 8px; text-align: center; color: #0f172a; border: 2px solid #cbd5e1; border-radius: 12px; background: #f8fafc; outline: none; transition: border-color 0.2s ease-in-out;"
+                    onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#cbd5e1'">
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="cancel-code-btn" style="flex: 1; padding: 12px 20px; background: #f1f5f9; color: #475569; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; transition: background 0.2s;">
+                    Cancel
+                </button>
+                <button id="confirm-code-btn" style="flex: 2; padding: 12px 20px; background: #10b981; color: #ffffff; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: background 0.2s;"
+                        onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'">
+                    Authorize Transfer
+                </button>
+            </div>
+
+        </div>
+    </div>
+    
+    <dialog id="crypto-auth-modal" style="border: none; border-radius: 16px; padding: 0; box-shadow: 0 20px 25px rgba(0,0,0,0.1); max-width: 420px; background: #ffffff; overflow: hidden;">
+    
+    <div style="position: absolute; top: 0; left: 0; width: 97%; height: 6px; background: linear-gradient(90deg, #10b981, #059669); border-top-left-radius: 16px; border-top-right-radius: 16px; margin-left: 7px; margin-top: 5px;"></div>
+
+    <div style="padding: 32px; text-align: center;">
+        <h3 style="color: #0f172a; font-size: 20px; font-weight: 700; margin-bottom: 8px; margin-top: 8px;">🔒 Security Mainframe</h3>
+        <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin-bottom: 24px; padding: 0 10px;">Enter the payload verification string from Discord.</p>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 700; font-size: 12px; margin-bottom: 8px; color: #475569; text-align: left;">Discord Payload:</label>
+            <input type="text" id="scrambled-input" maxlength="6" placeholder="582393" 
+                style="width: 100%; padding: 12px; font-size: 22px; font-weight: 700; letter-spacing: 4px; text-align: center; color: #0f172a; border: 2px solid #cbd5e1; border-radius: 12px; background: #f8fafc; box-sizing: border-box; outline: none; transition: border-color 0.2s;">
+        </div>
+
+        <div id="key-upload-section" style="display: none; margin-bottom: 20px; padding: 16px; background: #f1f5f9; border-radius: 12px; border: 1px dashed #cbd5e1;">
+            <label style="display: block; font-weight: 700; font-size: 12px; margin-bottom: 8px; color: #475569;">Upload/Change Key File (.json):</label>
+            <input type="file" id="key-file-upload" accept=".json" style="width: 100%; font-size: 12px; cursor: pointer;">
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="close-modal-btn" style="flex: 1; padding: 12px 20px; background: #f1f5f9; color: #475569; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer;">
+                Cancel
+            </button>
+            <button id="decrypt-verify-btn" style="flex: 2; padding: 12px 20px; background: #007bff; color: #ffffff; font-size: 14px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0, 123, 255, 0.2);">
+                Verify
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<div id="modern-alert" style="
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    padding: 20px 40px; background: #ef4444; color: white; border-radius: 12px;
+    display: none; opacity: 0; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    font-weight: 600; text-align: center; transition: opacity 0.3s ease-in-out;
+    pointer-events: none;">
+    </div>
+
+    <script type="module" src="app.js"></script>
+
+
+
+</body>
+</html>
