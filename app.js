@@ -567,10 +567,7 @@ UI.cancelVerification.addEventListener('click', () => {
 
 
 
-// FUNCTIONS INIT
-const functions = getFunctions(app);
-const initiateTransfer = httpsCallable(functions, 'initiateTransfer');
-const commitTransfer = httpsCallable(functions, 'commitTransfer');
+
 
 
 async function handleTransferRequest(amount, recipientId) {
@@ -582,11 +579,24 @@ async function handleTransferRequest(amount, recipientId) {
 
     try {
 
-        await initiateTransfer({
-            key: {loadedKeyData},
-            recepientEmail: recipientId,
-            transferAmount: amount
+        const user = auth.currentUser;
+        const idToken = await user.getIdToken();
+
+        const response = await fetch('https://your-render-app-url.onrender.com/initiateTransfer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                key: loadedKeyData,
+                recipientEmail: recipientId,
+                transferAmount: amount
+            })
         });
+
+        const result = await response.json();
+        console.log(result);
 
         const userEnteredCode = prompt("Enter your 6-digit PIN:");
 
@@ -679,10 +689,23 @@ function modernAlert(text) {
 
 window.addEventListener('keydown', async(event) => {
     if (event.key === 'q') {
-        await initiateTransfer({
-            key: {loadedKeyData},
-            recepientEmail: "ayeshabulehieh@gmail.com",
-            transferAmount: 67
+        const user = auth.currentUser;
+        const idToken = await user.getIdToken();
+
+        const response = await fetch('https://your-render-app-url.onrender.com/initiateTransfer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                key: loadedKeyData,
+                recipientEmail: "ayeshgithub@gmail.com",
+                transferAmount: 67
+            })
         });
+
+        const result = await response.json();
+        console.log(result);
     }
 });
