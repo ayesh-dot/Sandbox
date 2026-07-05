@@ -94,6 +94,11 @@ export const initiateTransfer = async (req, res) => {
             return res.status(400).send({ error: "invalid-argument", message: "UUID must be a valid 36-character string." });
         }
 
+        const existingSms = await admin.firestore().collection("sms").doc(uid).get();
+        if (existingSms.exists) {
+            return res.status(400).send({ error: "already-exists", message: "A verification request is already pending." });
+        }
+
         let code = [];
         let encryptedCode = [];
 
@@ -108,8 +113,15 @@ export const initiateTransfer = async (req, res) => {
 
         let finalEncrypted = crypto.createHash('sha256').update(encryptedCode.join('') + UUID).digest('hex');
 
+        const expirationTime = new Date();
+        expirationTime.setMinutes(expirationTime.getMinutes() + 5);
+
         await admin.firestore().collection("sms").doc(uid).set({
             code: finalEncrypted,
+            senderUid: uid,
+            recipientEmail: recipientEmail,
+            transferAmount: transferAmount,
+            expiresAt: admin.firestore.Timestamp.fromDate(expirationTime),
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
