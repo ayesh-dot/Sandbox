@@ -47,28 +47,29 @@ export const initiateTransfer = async (req, res) => {
             return res.status(404).send({ error: "not-found", message: "User account not found." });
         }
         const userData = userDoc.data();
-        
-        const recipientSnapshot = await admin.firestore().collection("userdata").where("email", "==", recipientEmail).get();
-        if (recipientSnapshot.empty) {
+
+        let recipientUserRecord;
+        try {
+            recipientUserRecord = await admin.auth().getUserByEmail(recipientEmail);
+        } catch (e) {
             return res.status(404).send({ error: "not-found", message: "Recipient not found." });
         }
-        const recipient = recipientSnapshot.docs[0];
-        
-        let recipientUid = null;
-        try {
-            recipientUid = await admin.auth().getUserByEmail(recipientEmail);
-        } catch (e) {
-           return res.status(404).send({ error: "not-found", message: "Recipient not found." });
+
+        const recipientUid = recipientUserRecord.uid;
+        const recipientDoc = await admin.firestore().collection("userdata").doc(recipientUid).get();
+
+        if (!recipientDoc.exists) {
+            return res.status(404).send({ error: "not-found", message: "Recipient not found." });
         }
 
         if (userData.balance < transferAmount) {
             return res.status(400).send({ error: "failed-precondition", message: "Insufficient funds for this transfer." });
         }
 
-        if (recipientUid?.uid === uid) {
+        if (recipientUid === uid) {
             return res.status(400).send({ error: "failed-precondition", message: "You cannot transfer funds to yourself." });
         }
-        
+
         if (transferAmount <= 0) {
             return res.status(400).send({ error: "failed-precondition", message: "Transfer amount must be greater than zero." });
         }
