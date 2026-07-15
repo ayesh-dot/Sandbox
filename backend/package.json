@@ -4,7 +4,9 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev:auth": "nodemon backend/auth-bot.js",
+    "dev:hist": "nodemon backend/hist-bot.js"
   },
   "keywords": [],
   "author": "",
@@ -12,9 +14,11 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.6",
+    "discord-oauth2": "^2.12.1",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "firebase-admin": "^13.10.0"
+    "firebase-admin": "^13.10.0",
+    "nodemon": "^3.1.14"
   }
 }
