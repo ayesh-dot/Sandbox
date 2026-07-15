@@ -13,6 +13,11 @@
         <span id="status-emoji" style="font-size: 24px; font-weight: bold; color: #ef4444;">&times;</span>
     </button>
 
+    <button id="discord-btn">
+        <span id="discord-icon">D</span>
+    </button>
+    
+
     <dialog id="upload-modal" style="padding: 20px; border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <h3>Load Security Key</h3>
         <p>Upload your .json file to authorize this session.</p>
@@ -60,7 +65,7 @@
             
             <form id="transfer-form" onsubmit="return false;">
                 <div class="input-group" style="margin-top: 15px; margin-bottom: 15px;">
-                    <label for="transfer-recipient" style="display: block; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 5px;">Recipient Email / Alias</label>
+                    <label for="transfer-recipient" style="display: block; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 5px;">Recipient Email</label>
                     <input type="email" id="transfer-recipient" placeholder="username@gmail.com" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--color-border); background: transparent; color: white;">
                 </div>
 

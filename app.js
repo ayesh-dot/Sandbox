@@ -689,23 +689,26 @@ function modernAlert(text) {
 
 window.addEventListener('keydown', async(event) => {
     if (event.key === 'q') {
-        const user = auth.currentUser;
-        const idToken = await user.getIdToken();
+        // const user = auth.currentUser;
+        // const idToken = await user.getIdToken();
 
-        const response = await fetch('https://your-render-app-url.onrender.com/initiateTransfer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`
-            },
-            body: JSON.stringify({
-                key: loadedKeyData,
-                recipientEmail: "ayeshgithub@gmail.com",
-                transferAmount: 67
-            })
-        });
+        // const response = await fetch('https://your-render-app-url.onrender.com/initiateTransfer', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': `Bearer ${idToken}`
+        //     },
+        //     body: JSON.stringify({
+        //         key: loadedKeyData,
+        //         recipientEmail: "ayeshgithub@gmail.com",
+        //         transferAmount: 67
+        //     })
+        // });
 
-        const result = await response.json();
-        console.log(result);
+        // const result = await response.json();
+        // console.log(result);
+
+        const idToken = await auth.currentUser.getIdToken();
+        console.log(idToken);
     }
 });

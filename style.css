@@ -626,7 +626,26 @@ button.secondary-btn:hover {
     color: #10b981; 
 }
 
-#security-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+
+
+#discord-btn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #cbd5e1;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+#discord-icon {
+    font-size: 24px;
+    font-weight: bold;
+    color: #5865f2;
 }
