@@ -649,3 +649,139 @@ button.secondary-btn:hover {
     font-weight: bold;
     color: #5865f2;
 }
+
+
+dialog#discord-dialog {
+    background: #ffffff;
+    color: #2c3e50;
+    width: 400px;
+    padding: 24px;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    font-family: sans-serif;
+    
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+
+dialog#discord-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+dialog#discord-dialog h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.modal-step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.step-number {
+    background: #5865f2;
+    color: #ffffff;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex-grow: 1;
+}
+
+.step-content p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #495057;
+}
+
+.discord-btn, .server-btn, .submit-btn, .cancel-btn {
+    display: inline-block;
+    background: #5865f2;
+    color: #ffffff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.discord-btn:hover, .server-btn:hover, .submit-btn:hover {
+    background: #4752c4;
+}
+
+.server-btn {
+    background: #28a745;
+}
+
+.server-btn:hover {
+    background: #218838;
+}
+
+#activation-code-input {
+    width: 100%;
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    color: #495057;
+    font-size: 14px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+
+#activation-code-input:focus {
+    outline: none;
+    border-color: #5865f2;
+    box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+}
+
+.submit-btn {
+    width: 100%;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.cancel-btn {
+    background: #6c757d;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+}
+
+#upload-modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}

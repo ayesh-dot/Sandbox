@@ -712,3 +712,19 @@ window.addEventListener('keydown', async(event) => {
         console.log(idToken);
     }
 });
+
+const discordBtn = document.getElementById('discord-btn');
+const discordModal = document.getElementById('discord-dialog');
+discordBtn.addEventListener('click',() => {
+    if (discordModal.open) {
+        discordModal.close();
+    } else {
+        discordModal.showModal();
+    }
+});
+
+
+document.getElementById('discord-auth-btn').addEventListener('click', () => {
+    const discordUrl = "https://discord.com/api/oauth2/authorize?client_id=1524459756188729477&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A10000%2Fcallback&scope=identify";
+    window.open(discordUrl, '_blank');
+});

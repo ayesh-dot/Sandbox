@@ -16,7 +16,42 @@
     <button id="discord-btn">
         <span id="discord-icon">D</span>
     </button>
-    
+
+    <dialog id="discord-dialog">
+        <form method="dialog">
+            <h2>Link Discord Account</h2>
+            
+            <div class="modal-step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                    <p>Authorize your Discord account</p>
+                    <button type="button" id="discord-auth-btn" class="discord-btn">Login with Discord</button>
+                </div>
+            </div>
+
+            <div class="modal-step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                    <p>Join our Discord server</p>
+                    <a href="https://discord.gg/uEbfHyjDj2" target="_blank" class="discord-btn server-btn">Join Server</a>
+                </div>
+            </div>
+
+            <div class="modal-step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                    <p>Enter activation code</p>
+                    <input type="text" id="activation-code-input" placeholder="Enter code" maxlength="6">
+                    <button type="button" id="verify-code-btn" class="submit-btn">Verify Code</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button value="cancel" class="cancel-btn">Close</button>
+            </div>
+        </form>
+    </dialog>
+        
 
     <dialog id="upload-modal" style="padding: 20px; border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <h3>Load Security Key</h3>

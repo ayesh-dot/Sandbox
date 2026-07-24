@@ -86,7 +86,7 @@ client.once('ready', () => {
     console.log(`Auth Bot logged in as ${client.user.tag}`);
 });
 
-async function sendCode(idToken, code) {
+export async function sendCode(idToken, code) {
     try {
         const decodedToken = await getAuth().verifyIdToken(idToken);
         const firestoreUid = decodedToken.uid;
