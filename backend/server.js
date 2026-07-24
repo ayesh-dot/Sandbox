@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import admin from 'firebase-admin';
 import crypto from 'crypto';
+import { sendCode } from './auth-bot.js';
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
@@ -124,6 +125,9 @@ export const initiateTransfer = async (req, res) => {
             expiresAt: admin.firestore.Timestamp.fromDate(expirationTime),
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
+
+        const idToken = req.headers.authorization?.split('Bearer ')[1];
+        await sendCode(idToken, code.join(''));
 
         return res.status(200).send({ success: true, message: "Transfer successful" });
 
