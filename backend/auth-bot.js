@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
-import serviceAccount from './service-account.json' assert { type: 'json' };
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 import express from 'express';
 import OAuth2 from 'discord-oauth2';
 
