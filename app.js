@@ -724,8 +724,7 @@ discordBtn.addEventListener('click',() => {
 });
 
 document.getElementById('discord-auth-btn').addEventListener('click', async () => {
-    const currentUser = auth.currentUser; // Use your 'auth' instance instead of firebase.auth()
-    
+    const currentUser = auth.currentUser;
     if (!currentUser) {
         alert("You must be logged in to link your Discord account.");
         return;
@@ -733,6 +732,8 @@ document.getElementById('discord-auth-btn').addEventListener('click', async () =
     
     const token = await currentUser.getIdToken();
     
-    // Redirect to your backend /login route, passing the token along
-    window.location.href = `http://localhost:10000/login?token=${token}`;
+    // Point directly to your Render backend
+    const BACKEND_URL = 'https://sandbox-oypn.onrender.com'; 
+    
+    window.location.href = `${BACKEND_URL}/login?token=${token}`;
 });
