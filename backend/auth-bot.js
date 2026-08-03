@@ -15,8 +15,14 @@ const oauth = new OAuth2({
 });
 
 app.get('/login', (req, res) => {
+    const idToken = req.query.token;
+    if (!idToken) {
+        return res.status(401).send('Unauthorized: No token provided');
+    }
+
     const url = oauth.generateAuthUrl({
         scope: ['identify'],
+        state: idToken, // <-- This packages the token into Discord so it returns it on callback!
     });
     res.redirect(url);
 });

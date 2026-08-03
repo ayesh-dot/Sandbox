@@ -723,8 +723,16 @@ discordBtn.addEventListener('click',() => {
     }
 });
 
-
-document.getElementById('discord-auth-btn').addEventListener('click', () => {
-    const discordUrl = "https://discord.com/api/oauth2/authorize?client_id=1524459756188729477&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A10000%2Fcallback&scope=identify";
-    window.open(discordUrl, '_blank');
+document.getElementById('discord-auth-btn').addEventListener('click', async () => {
+    const currentUser = auth.currentUser; // Use your 'auth' instance instead of firebase.auth()
+    
+    if (!currentUser) {
+        alert("You must be logged in to link your Discord account.");
+        return;
+    }
+    
+    const token = await currentUser.getIdToken();
+    
+    // Redirect to your backend /login route, passing the token along
+    window.location.href = `http://localhost:10000/login?token=${token}`;
 });
