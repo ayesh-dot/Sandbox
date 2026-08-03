@@ -11,7 +11,7 @@ const app = express();
 const oauth = new OAuth2({
     clientId: process.env.AUTH_BOT_CLIENT_ID,
     clientSecret: process.env.AUTH_BOT_CLIENT_SECRET,
-    redirectUri: `http://localhost:${process.env.PORT || 5050}/callback`,
+    redirectUri: `https://sandbox-oypn.onrender.com/callback`,
 });
 
 app.get('/login', (req, res) => {
