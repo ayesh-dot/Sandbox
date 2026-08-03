@@ -30,8 +30,7 @@ app.get('/login', (req, res) => {
 
 
 app.get('/callback', async (req, res) => {
-
-    const idToken = req.headers.authorization?.split('Bearer ')[1];
+    const idToken = req.query.state;
     
     if (!idToken) {
         return res.status(401).send('Unauthorized: No token provided');
