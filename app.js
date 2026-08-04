@@ -195,90 +195,64 @@ createAccButton.addEventListener('click', async () => {
         return;
     }
 
-    let uniqueCardNumber = "";
-    let isUnique = false;
-
     const user = auth.currentUser;
-
     if (!user) {
         console.log("No User Detected!");
         return;
     }
 
-
-    while (!isUnique) {
-        uniqueCardNumber = generateRandomDebitCard();
-
-        console.log(`Checking database uniqueness for card: ${uniqueCardNumber}...`);
-
-        // Create a query checking if any doc has this card number
-        const cardQuery = query(
-            collection(db, "userdata"), 
-            where("cardNumber", "==", uniqueCardNumber)
-        );
-        
-        // Execute the query check
-        const querySnapshot = await getDocs(cardQuery);
-
-        if (querySnapshot.empty) {
-            isUnique = true;
-            console.log("Card number is unique! Proceeding with account creation.");
-            
-        } else {
-            console.warn("Collision detected! Regenerating card number...");
-        }
-    }
-
-
+    // Clean package without client-side card generation or queries
     const accountData = {
         firstName: firstNameInput.value.trim(),
         lastName: lastNameInput.value.trim(),
         dob: `${yearInput.value}-${monthInput.value}-${dayInput.value}`,
         cvv: cvvInput.value,
         phone: phoneInput.value.trim(),
-        cardNumber: uniqueCardNumber, // This is guaranteed unique now
-        balance: 100.00,             // Starting seed capital
+        balance: 100.00, // Starting seed capital
         uid: user.uid
     };
 
-
     try {
-        const documentId = accountData.uid; 
-        const userDocRef = doc(db, "userdata", documentId);
+        console.log("Sending account package to backend...");
         
-        console.log("Document reference created. Sending payload...");
+        const response = await fetch('https://sandbox-oypn.onrender.com/api/create-account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(accountData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || "Failed to create account on server.");
+        }
         
-        // Pause and wait for the database write operation to complete successfully
-        await setDoc(userDocRef, accountData);
-        
-        console.log("🎯 Server acknowledged the write!");
+        console.log("🎯 Server acknowledged and saved the account!");
         generateKeyJSON();
         modernAlert('Your information has been saved successfully!');
         
-        // Pause and wait for the profile checker function to return the string status
         let status = await getLoggedIndata();
         let xAccountData = await getLoggedIndata(true);
 
         if (status === created) {
-            // Update user profile info in the UI
             userName.textContent = `Welcome back, ${user.displayName}`;
             userEmail.textContent = user.email;
             userPhoto.src = user.photoURL || 'https://via.placeholder.com/72';
             showDashboards();
             updateUI(xAccountData);
             
-            // Toggle view visibility
             main.classList.remove('hidden');
             loggedOutView.classList.add('hidden');
             loggedInView.classList.remove('hidden');
-            createAccountCard.classList.add('hidden'); // Ensure registration card hides
+            createAccountCard.classList.add('hidden');
         } else {
             main.classList.add('hidden');
             createAccountCard.classList.remove('hidden');
         }
 
     } catch (error) {
-        // This catch block catches server rejections from setDoc, getLoggedIndata, or local code errors
         console.error("❌ SERVER REJECTED THE WRITE OR LOCAL FAILURE:", error);
         modernAlert("Account Creation Error: " + error.message);
     }
