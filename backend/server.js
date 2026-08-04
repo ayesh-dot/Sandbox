@@ -154,7 +154,7 @@ function generateRandomDebitCard() {
     return cardNum;
 }
 
-app.post('/api/create-account', async (req, res) => {
+app.post('/create-account', async (req, res) => {
     try {
         const { firstName, lastName, dob, cvv, phone, balance, uid } = req.body;
 

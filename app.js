@@ -215,7 +215,7 @@ createAccButton.addEventListener('click', async () => {
     try {
         console.log("Sending account package to backend...");
         
-        const response = await fetch('https://sandbox-oypn.onrender.com/api/create-account', {
+        const response = await fetch('https://sandbox-oypn.onrender.com/create-account', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
