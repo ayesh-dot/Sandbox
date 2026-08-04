@@ -16,7 +16,12 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Or specify 'http://localhost:5500'
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Middleware to verify ID Token
