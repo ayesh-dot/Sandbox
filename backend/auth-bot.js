@@ -3,11 +3,23 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+import cors from 'cors';
 import express from 'express';
 import OAuth2 from 'discord-oauth2';
 
 const app = express();
+
+app.use(cors({
+    origin: '*', // Or specify 'http://localhost:5500'
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
 const oauth = new OAuth2({
     clientId: process.env.AUTH_BOT_CLIENT_ID,
     clientSecret: process.env.AUTH_BOT_CLIENT_SECRET,
