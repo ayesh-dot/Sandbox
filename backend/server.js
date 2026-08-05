@@ -234,8 +234,7 @@ function generateRandomDebitCard() {
 // });
 
 
-// Catch-all to log every request that Express actually sees
-useRequestLogger = (req, res, next) => {
+const useRequestLogger = (req, res, next) => {
     console.log(`📥 INCOMING REQUEST: ${req.method} ${req.url}`);
     next();
 };
