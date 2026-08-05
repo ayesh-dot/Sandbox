@@ -159,7 +159,7 @@ app.post('/create-account', async (req, res) => {
     try {
         const { firstName, lastName, dob, cvv, phone, balance, uid } = req.body;
 
-        // Validation checks
+        // Validation check
         if (!uid || typeof uid !== 'string') {
             return res.status(400).json({ error: "Invalid or missing user ID." });
         }
