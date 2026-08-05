@@ -25,17 +25,6 @@ app.use(cors({
 app.use(express.json());
 
 
-app.post('/create-account', async (req, res) => {
-    console.log("🔥 HIT /create-account ROUTE!");
-    try {
-        // your code here
-        res.json({ success: true });
-    } catch (err) {
-        console.error("Route error:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
 // Middleware to verify ID Token
 app.use(async (req, res, next) => {
     const idToken = req.headers.authorization?.split('Bearer ')[1];
@@ -166,79 +155,73 @@ function generateRandomDebitCard() {
     return cardNum;
 }
 
-// app.post('/create-account', async (req, res) => {
-//     try {
-//         const { firstName, lastName, dob, cvv, phone, balance, uid } = req.body;
+app.post('/create-account', async (req, res) => {
+    try {
+        const { firstName, lastName, dob, cvv, phone, balance, uid } = req.body;
 
-//         // Validation checks
-//         if (!uid || typeof uid !== 'string') {
-//             return res.status(400).json({ error: "Invalid or missing user ID." });
-//         }
-//         if (!firstName || !lastName || firstName.trim() === "" || lastName.trim() === "") {
-//             return res.status(400).json({ error: "First and last name are required." });
-//         }
-//         if (!phone || typeof phone !== 'string' || phone.trim() === "") {
-//             return res.status(400).json({ error: "A valid phone number is required." });
-//         }
-//         if (!/^\d{3,4}$/.test(cvv)) {
-//             return res.status(400).json({ error: "Invalid CVV format." });
-//         }
+        // Validation checks
+        if (!uid || typeof uid !== 'string') {
+            return res.status(400).json({ error: "Invalid or missing user ID." });
+        }
+        if (!firstName || !lastName || firstName.trim() === "" || lastName.trim() === "") {
+            return res.status(400).json({ error: "First and last name are required." });
+        }
+        if (!phone || typeof phone !== 'string' || phone.trim() === "") {
+            return res.status(400).json({ error: "A valid phone number is required." });
+        }
+        if (!/^\d{3,4}$/.test(cvv)) {
+            return res.status(400).json({ error: "Invalid CVV format." });
+        }
 
-//         // GENERATE UNIQUE CARD NUMBER ON THE SERVER
-//         let uniqueCardNumber = "";
-//         let isUnique = false;
-//         let attempts = 0;
+        // GENERATE UNIQUE CARD NUMBER ON THE SERVER
+        let uniqueCardNumber = "";
+        let isUnique = false;
+        let attempts = 0;
 
-//         while (!isUnique && attempts < 10) {
-//             attempts++;
-//             uniqueCardNumber = generateRandomDebitCard();
+        while (!isUnique && attempts < 10) {
+            attempts++;
+            uniqueCardNumber = generateRandomDebitCard();
 
-//             // Admin SDK query checks uniqueness safely without rule errors
-//             const existingCardQuery = await db.collection('userdata')
-//                 .where('cardNumber', '==', uniqueCardNumber)
-//                 .get();
+            // Admin SDK query checks uniqueness safely without rule errors
+            const existingCardQuery = await db.collection('userdata')
+                .where('cardNumber', '==', uniqueCardNumber)
+                .get();
 
-//             if (existingCardQuery.empty) {
-//                 isUnique = true;
-//             }
-//         }
+            if (existingCardQuery.empty) {
+                isUnique = true;
+            }
+        }
 
-//         if (!isUnique) {
-//             return res.status(500).json({ error: "Could not generate a unique card number. Please try again." });
-//         }
+        if (!isUnique) {
+            return res.status(500).json({ error: "Could not generate a unique card number. Please try again." });
+        }
 
-//         // SECURE WRITE VIA ADMIN SDK
-//         const userDocRef = db.collection('userdata').doc(uid);
+        // SECURE WRITE VIA ADMIN SDK
+        const userDocRef = db.collection('userdata').doc(uid);
         
-//         const verifiedAccountData = {
-//             firstName: firstName.trim(),
-//             lastName: lastName.trim(),
-//             dob: dob,
-//             cvv: cvv,
-//             phone: phone.trim(),
-//             cardNumber: uniqueCardNumber,
-//             balance: typeof balance === 'number' ? balance : 100.00,
-//             uid: uid,
-//             createdAt: admin.firestore.FieldValue.serverTimestamp()
-//         };
+        const verifiedAccountData = {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            dob: dob,
+            cvv: cvv,
+            phone: phone.trim(),
+            cardNumber: uniqueCardNumber,
+            balance: typeof balance === 'number' ? balance : 100.00,
+            uid: uid,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        };
 
-//         await userDocRef.set(verifiedAccountData);
+        await userDocRef.set(verifiedAccountData);
 
-//         console.log(`✅ Server successfully created account with card ${uniqueCardNumber} for UID: ${uid}`);
-//         return res.status(200).json({ success: true, message: "Account created successfully." });
+        console.log(`✅ Server successfully created account with card ${uniqueCardNumber} for UID: ${uid}`);
+        return res.status(200).json({ success: true, message: "Account created successfully." });
 
-//     } catch (error) {
-//         console.error("❌ Backend error during account creation:", error);
-//         return res.status(500).json({ error: "Internal server error while creating account." });
-//     }
-// });
+    } catch (error) {
+        console.error("❌ Backend error during account creation:", error);
+        return res.status(500).json({ error: "Internal server error while creating account." });
+    }
+});
 
-
-const useRequestLogger = (req, res, next) => {
-    console.log(`📥 INCOMING REQUEST: ${req.method} ${req.url}`);
-    next();
-};
-app.use(useRequestLogger);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
