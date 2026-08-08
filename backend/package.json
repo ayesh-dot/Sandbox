@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev:auth": "nodemon backend/auth-bot.js",
-    "dev:hist": "nodemon backend/hist-bot.js"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
