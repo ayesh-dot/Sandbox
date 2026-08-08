@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import admin from 'firebase-admin';
 import crypto from 'crypto';
-import { sendCode } from './auth-bot.js';
 
 import { Client, GatewayIntentBits } from 'discord.js';
 import { initializeApp, cert } from 'firebase-admin/app';
