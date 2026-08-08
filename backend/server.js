@@ -212,9 +212,11 @@ app.get('/callback', async (req, res) => {
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-initializeApp({
-    credential: cert(serviceAccount)
-});
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+    });
+}
 
 const client = new Client({ 
     intents: [
