@@ -216,8 +216,6 @@ initializeApp({
     credential: cert(serviceAccount)
 });
 
-const db = getFirestore();
-
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
