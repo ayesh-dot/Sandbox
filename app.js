@@ -360,6 +360,35 @@ async function revealData(){
     }
 }
 
+async function debitOnLoad(){
+
+    const cardNumberDisplay = document.querySelector('.card-number-display');
+    const cardCvvDisplay    = document.getElementById('ui-card-cvv');
+    const cardNameDisplay   = document.getElementById('ui-card-name');
+    const cardRevealBtn     = document.getElementById('revealer');
+
+    cardNumberDisplay.textContent = `$4783 92•• •••• ••••`;
+    cardCvvDisplay.textContent = "•••";
+    
+    const accountData = await getLoggedIndata(true);
+
+    const rawCardNumber = String(accountData.cardNumber).replace(/\s+/g, '');
+    const lastFourDigits = rawCardNumber.slice(12, 16); // e.g., "5143"
+    const firstSixDigits = rawCardNumber.slice(0, 6);   // e.g., "478392"
+
+    // HIDDEN MODE: Manually format using both the first 6 and last 4 constants
+    const block1 = firstSixDigits.slice(0, 4); // First 4 digits
+    const block2 = firstSixDigits.slice(4, 6); // Next 2 digits
+    
+    // Assembles into: "XXXX XX•• •••• XXXX" matching your exact wrapping layout
+    cardNumberDisplay.textContent = `${block1} ${block2}•• •••• ${lastFourDigits}`;
+    cardCvvDisplay.textContent = "•••";
+    
+    cardRevealBtn.textContent = "REVEAL METADATA";
+    cardRevealBtn.dataset.isHidden = "true";
+
+};
+
 
 // --- DASHBOARD CONTAINER DOM CONSTANTS ---
 const transfersDashboard = document.getElementById('transfers-dashboard');
@@ -367,6 +396,7 @@ const debitCardDashboard = document.getElementById('debit-card-dashboard');
 const ledgerDashboard = document.getElementById('ledger-dashboard');
 const cardConfigDashboard = document.getElementById('card-config-dashboard');
 const keyUploadButton = document.getElementById('security-btn');
+const discordDashboard = document.getElementById('discord-btn');
 // --- --- --- --- --- --- --- --- --- --- -
 // --- --- --- --- --- --- --- --- --- --- -
 
@@ -376,7 +406,10 @@ function hideDashboards(){
     ledgerDashboard.classList.add('hidden');
     cardConfigDashboard.classList.add('hidden');
     keyUploadButton.classList.add('hidden');
+    discordDashboard.classList.add('hidden');
 }
+
+hideDashboards(); // Ensure dashboards are hidden on initial load
 
 async function showDashboards(){
     transfersDashboard.classList.remove('hidden');
@@ -384,7 +417,8 @@ async function showDashboards(){
     ledgerDashboard.classList.remove('hidden');
     cardConfigDashboard.classList.remove('hidden');
     keyUploadButton.classList.remove('hidden');
-
+    discordDashboard.classList.remove('hidden');
+    debitOnLoad(); // Ensure the debit card is initialized correctly
     let xData = await getLoggedIndata(true);
     updateUI(xData);
 }
