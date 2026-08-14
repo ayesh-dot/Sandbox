@@ -451,7 +451,7 @@ async function generateKeyJSON() {
         body: JSON.stringify(earlyPayload)
     });
 
-    generatedSignature = await response.json();
+    let generatedSignature = await response.json();
 
     const keyFilePayload = {
         uniqueUUID: uniqueId,
