@@ -443,7 +443,7 @@ async function generateKeyJSON() {
         issuedAt: new Date().toISOString()
     };
 
-    const response = await fetch('/api/sign-key', {
+    const response = await fetch('https://sandbox-oypn.onrender.com/api/sign-key', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
