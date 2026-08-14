@@ -424,7 +424,7 @@ async function showDashboards(){
 }
 
 
-function generateKeyJSON() {
+async function generateKeyJSON() {
     const uniqueId = window.crypto.randomUUID();
     let cipherPad = [];
     
@@ -437,10 +437,27 @@ function generateKeyJSON() {
         cipherPad.push(digit);
     }
 
-    const keyFilePayload = {
+    const earlyPayload = {
         uniqueUUID: uniqueId,
         cipherPad: cipherPad,
         issuedAt: new Date().toISOString()
+    };
+
+    const response = await fetch('/api/sign-key', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(earlyPayload)
+    });
+
+    generatedSignature = await response.json();
+
+    const keyFilePayload = {
+        uniqueUUID: uniqueId,
+        cipherPad: cipherPad,
+        issuedAt: new Date().toISOString(),
+        signature: generatedSignature
     };
 
     // Commit cleanly to local browser storage

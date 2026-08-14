@@ -206,6 +206,21 @@ app.get('/callback', async (req, res) => {
     }
 });
 
+app.get('/api/sign-key', async (req, res) => {
+    const { uniqueUUID, cipherPad, issuedAt } = req.body;
+
+    if (!uniqueUUID || !cipherPad || !issuedAt) {
+        return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    const payloadString = JSON.stringify({ uniqueUUID, cipherPad, issuedAt });
+    const signature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
+                            .update(payloadString)
+                            .digest('hex');
+
+    res.json({ signature });
+});
+
 
 
 
