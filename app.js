@@ -639,7 +639,7 @@ async function handleTransferRequest(amount, recipientId) {
         const result = await response.json();
         console.log(result);
 
-        const userEnteredCode = prompt("Enter your 6-digit PIN:");
+        // const userEnteredCode = prompt("Enter your 6-digit PIN:");
 
         if (userEnteredCode) {
             const result = await commitTransfer({

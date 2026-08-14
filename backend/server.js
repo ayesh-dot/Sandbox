@@ -54,7 +54,7 @@ app.post('/initiatetransfer', async (req, res) => {
 
     try {
         const { recipientEmail, transferAmount, key } = req.body;
-        const { uniqueUUID: UUID, cipherPad, signature } = key || {};
+        const { uniqueUUID: UUID, cipherPad, issuedAt, signature } = key || {};
 
         const userDoc = await admin.firestore().collection("userdata").doc(uid).get();
         if (!userDoc.exists) {
