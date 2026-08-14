@@ -579,7 +579,7 @@ transferBtn.addEventListener('click', (event) => {
 const UI = {
     cancelVerification: document.getElementById('close-modal-btn'),
     transferRecipient: document.getElementById('transfer-recipient'),
-    transferAmount: document.getdElementById('transfer-amount'),
+    transferAmount: document.getElementById('transfer-amount'),
     transferSubmit: document.getElementById('send-transfer-btn'),
 };
 
