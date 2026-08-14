@@ -579,17 +579,33 @@ transferBtn.addEventListener('click', (event) => {
 const UI = {
     cancelVerification: document.getElementById('close-modal-btn'),
     transferRecipient: document.getElementById('transfer-recipient'),
-    transferAmount: document.getElementById('transfer-amount'),
+    transferAmount: document.getdElementById('transfer-amount'),
+    transferSubmit: document.getElementById('send-transfer-btn'),
 };
 
 
 UI.cancelVerification.addEventListener('click', () => {
     closeSecurityDialog();
-    cancelVerification();
+    // cancelVerification();
 });
 
 
+UI.transferSubmit.addEventListener('click', async () => {
+    const amount = parseFloat(UI.transferAmount.value);
+    const recipientId = UI.transferRecipient.value.trim();
 
+    if (isNaN(amount) || amount <= 0) {
+        modernAlert("Please enter a valid transfer amount.");
+        return;
+    }
+
+    if (!recipientId) {
+        modernAlert("Please enter a valid recipient ID.");
+        return;
+    }
+
+    await handleTransferRequest(amount, recipientId);
+});
 
 
 
