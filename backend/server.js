@@ -46,7 +46,7 @@ app.use(async (req, res, next) => {
     }
 });
 
-app.post('/initiate-transfer', async (req, res) => {
+app.post('/initiatetransfer', async (req, res) => {
     const uid = req.user?.uid || req.body.uid; 
     if (!uid) {
         return res.status(401).send({ error: "unauthenticated", message: "You must be logged in to execute this transfer." });

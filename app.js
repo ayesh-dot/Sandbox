@@ -749,8 +749,8 @@ window.addEventListener('keydown', async(event) => {
         // const result = await response.json();
         // console.log(result);
 
-        const idToken = await auth.currentUser.getIdToken();
-        console.log(idToken);
+        // const idToken = await auth.currentUser.getIdToken();
+        // console.log(idToken);
     }
 });
 
