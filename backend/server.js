@@ -206,7 +206,7 @@ app.get('/callback', async (req, res) => {
     }
 });
 
-app.get('/api/sign-key', async (req, res) => {
+app.post('/api/sign-key', async (req, res) => {
     const { uniqueUUID, cipherPad, issuedAt } = req.body;
 
     if (!uniqueUUID || !cipherPad || !issuedAt) {
