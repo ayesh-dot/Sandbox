@@ -46,7 +46,7 @@ app.use(async (req, res, next) => {
     }
 });
 
-export const initiateTransfer = async (req, res) => {
+app.post('/initiate-transfer', async (req, res) => {
     const uid = req.user?.uid || req.body.uid; 
     if (!uid) {
         return res.status(401).send({ error: "unauthenticated", message: "You must be logged in to execute this transfer." });
@@ -54,7 +54,7 @@ export const initiateTransfer = async (req, res) => {
 
     try {
         const { recipientEmail, transferAmount, key } = req.body;
-        const { uniqueUUID: UUID, cipherPad } = key || {};
+        const { uniqueUUID: UUID, cipherPad, signature } = key || {};
 
         const userDoc = await admin.firestore().collection("userdata").doc(uid).get();
         if (!userDoc.exists) {
@@ -88,7 +88,7 @@ export const initiateTransfer = async (req, res) => {
             return res.status(400).send({ error: "failed-precondition", message: "Transfer amount must be greater than zero." });
         }
 
-        if (!UUID || !cipherPad || cipherPad.length < 6) {
+        if (!UUID || !signature || !cipherPad || cipherPad.length < 6) {
             return res.status(400).send({ error: "invalid-argument", message: "Invalid key data provided." });
         }
 
@@ -107,6 +107,16 @@ export const initiateTransfer = async (req, res) => {
         if (UUID.length !== 36) {
             return res.status(400).send({ error: "invalid-argument", message: "UUID must be a valid 36-character string." });
         }
+
+        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, userId: uid, issuedAt });
+        const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
+                                    .update(payloadString)
+                                    .digest('hex');
+
+        if (signature !== expectedSignature) {
+            return res.status(401).send({ error: "unauthenticated", message: "Invalid cryptographic signature. Key tampering or account mismatch detected." });
+        }
+        
 
         const existingSms = await admin.firestore().collection("sms").doc(uid).get();
         if (existingSms.exists) {
@@ -147,9 +157,7 @@ export const initiateTransfer = async (req, res) => {
     } catch (error) {
         return res.status(500).send({ error: "internal", message: error.message });
     }
-};
-
-app.post('/initiateTransfer', initiateTransfer);
+});
 
 
 const oauth = new OAuth2({
@@ -244,7 +252,7 @@ client.once('ready', () => {
     console.log(`Auth Bot logged in as ${client.user.tag}`);
 });
 
-export async function sendCode(idToken, code) {
+async function sendCode(idToken, code) {
     try {
         const decodedToken = await getAuth().verifyIdToken(idToken);
         const firestoreUid = decodedToken.uid;

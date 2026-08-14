@@ -607,7 +607,7 @@ async function handleTransferRequest(amount, recipientId) {
         const user = auth.currentUser;
         const idToken = await user.getIdToken();
 
-        const response = await fetch('https://your-render-app-url.onrender.com/initiateTransfer', {
+        const response = await fetch('https://https://sandbox-oypn.onrender.com/initiateTransfer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
