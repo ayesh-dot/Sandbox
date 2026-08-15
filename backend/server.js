@@ -146,7 +146,7 @@ app.post('/initiatetransfer', async (req, res) => {
         
         const privateId = doc.data().privateId;
 
-        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, privateId, issuedAt });
+        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, issuedAt, privateId });
         const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
                                     .update(payloadString)
                                     .digest('hex');
