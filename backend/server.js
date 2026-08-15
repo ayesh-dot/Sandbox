@@ -144,7 +144,7 @@ app.post('/initiatetransfer', async (req, res) => {
             return res.status(404).send({ error: "not-found", message: "Private ID not found for user." });
         }
         
-        privateId = doc.data().privateId;
+        const privateId = doc.data().privateId;
 
         const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, privateId, issuedAt });
         const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
