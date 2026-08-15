@@ -455,11 +455,13 @@ async function generateKeyJSON() {
 
     const data = await response.json();
 
+    const signatureString = data.signature;
+
     const keyFilePayload = {
         uniqueUUID: uniqueId,
         cipherPad: cipherPad,
         issuedAt: issuedAtTime, 
-        signature: generatedSignature 
+        signature: signatureString 
     };
 
     // Commit cleanly to local browser storage
