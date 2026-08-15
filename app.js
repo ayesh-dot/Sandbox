@@ -437,10 +437,12 @@ async function generateKeyJSON() {
         cipherPad.push(digit);
     }
 
+    const issuedAtTime = new Date().toISOString();
+
     const earlyPayload = {
         uniqueUUID: uniqueId,
         cipherPad: cipherPad,
-        issuedAt: new Date().toISOString()
+        issuedAt: issuedAtTime
     };
 
     const response = await fetch('https://sandbox-oypn.onrender.com/api/sign-key', {
@@ -451,13 +453,13 @@ async function generateKeyJSON() {
         body: JSON.stringify(earlyPayload)
     });
 
-    let generatedSignature = await response.json();
+    const data = await response.json();
 
     const keyFilePayload = {
         uniqueUUID: uniqueId,
         cipherPad: cipherPad,
-        issuedAt: new Date().toISOString(),
-        signature: generatedSignature
+        issuedAt: issuedAtTime, 
+        signature: generatedSignature 
     };
 
     // Commit cleanly to local browser storage
