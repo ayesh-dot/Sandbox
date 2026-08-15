@@ -138,8 +138,15 @@ app.post('/initiatetransfer', async (req, res) => {
             return res.status(400).send({ error: "invalid-argument", message: "UUID must be a valid 36-character string." });
         }
 
-        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, //userId: uid,
-             issuedAt });
+        const doc = await admin.firestore().collection("private").doc(uid).get();
+        if (!doc.exists || !doc.data().privateId) {
+            console.warn('❌ Private ID not found for UID:', uid);
+            return res.status(404).send({ error: "not-found", message: "Private ID not found for user." });
+        }
+        
+        privateId = doc.data().privateId;
+
+        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, privateId, issuedAt });
         const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
                                     .update(payloadString)
                                     .digest('hex');
@@ -259,13 +266,30 @@ app.get('/callback', async (req, res) => {
 
 app.post('/api/sign-key', async (req, res) => {
     const { uniqueUUID, cipherPad, issuedAt } = req.body;
-    
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const uid = decodedToken.uid;
+
+    const docRef = db.collection('private').doc(uid);
+    const doc = await docRef.get();
+
+    if (!doc.exists || !doc.data().privateId) {
+        throw new Error('Private ID not found for user');
+    }
+
+    const privateId = doc.data().privateId;
 
     if (!uniqueUUID || !cipherPad || !issuedAt) {
         return res.status(400).json({ error: "Missing required fields." });
     }
 
-    const payloadString = JSON.stringify({ uniqueUUID, cipherPad, issuedAt });
+    const payloadString = JSON.stringify({ uniqueUUID, cipherPad, issuedAt, privateId });
     const signature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
                             .update(payloadString)
                             .digest('hex');
@@ -383,6 +407,11 @@ app.post('/create-account', async (req, res) => {
         };
 
         await userDocRef.set(verifiedAccountData);
+
+        const privateId = crypto.randomBytes(16).toString('hex');
+        await db.collection('private').doc(uid).set({ 
+            privateId: privateId,
+        });
 
         console.log(`✅ Server successfully created account with card ${uniqueCardNumber} for UID: ${uid}`);
         return res.status(200).json({ success: true, message: "Account created successfully." });

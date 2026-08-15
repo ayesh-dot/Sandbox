@@ -445,10 +445,17 @@ async function generateKeyJSON() {
         issuedAt: issuedAtTime
     };
 
+    const currentUser = firebase.auth().currentUser;
+    if (!currentUser) {
+        throw new Error('User not logged in');
+    }
+    const token = await currentUser.getIdToken();
+
     const response = await fetch('https://sandbox-oypn.onrender.com/api/sign-key', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(earlyPayload)
     });
