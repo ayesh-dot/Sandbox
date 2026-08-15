@@ -138,7 +138,8 @@ app.post('/initiatetransfer', async (req, res) => {
             return res.status(400).send({ error: "invalid-argument", message: "UUID must be a valid 36-character string." });
         }
 
-        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, userId: uid, issuedAt });
+        const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, //userId: uid,
+             issuedAt });
         const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
                                     .update(payloadString)
                                     .digest('hex');
