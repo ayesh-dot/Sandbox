@@ -445,7 +445,7 @@ async function generateKeyJSON() {
         issuedAt: issuedAtTime
     };
 
-    const currentUser = firebase.auth().currentUser;
+    const currentUser = auth.currentUser;
     if (!currentUser) {
         throw new Error('User not logged in');
     }
