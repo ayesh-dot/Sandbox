@@ -215,6 +215,7 @@ createAccButton.addEventListener('click', async () => {
     try {
         console.log("Sending account package to backend...");
         
+        
         const response = await fetch('https://sandbox-oypn.onrender.com/create-account', {
             method: 'POST',
             headers: {
@@ -344,7 +345,7 @@ async function revealData(){
         cardNumberDisplay.textContent = rawNumberString;
         cardCvvDisplay.textContent = rawCvv;
         
-        cardRevealBtn.textContent = "HIDE METADATA";
+        cardRevealBtn.textContent = "HIDE";
         cardRevealBtn.dataset.isHidden = "false";
     } else {
         // HIDDEN MODE: Manually format using both the first 6 and last 4 constants
@@ -355,7 +356,7 @@ async function revealData(){
         cardNumberDisplay.textContent = `${block1} ${block2}•• •••• ${lastFourDigits}`;
         cardCvvDisplay.textContent = "•••";
         
-        cardRevealBtn.textContent = "REVEAL METADATA";
+        cardRevealBtn.textContent = "REVEAL";
         cardRevealBtn.dataset.isHidden = "true";
     }
 }
@@ -384,7 +385,7 @@ async function debitOnLoad(){
     cardNumberDisplay.textContent = `${block1} ${block2}•• •••• ${lastFourDigits}`;
     cardCvvDisplay.textContent = "•••";
     
-    cardRevealBtn.textContent = "REVEAL METADATA";
+    cardRevealBtn.textContent = "REVEAL";
     cardRevealBtn.dataset.isHidden = "true";
 
 };
@@ -592,6 +593,8 @@ const UI = {
     transferRecipient: document.getElementById('transfer-recipient'),
     transferAmount: document.getElementById('transfer-amount'),
     transferSubmit: document.getElementById('send-transfer-btn'),
+    verifyBtn: document.getElementById('decrypt-verify-btn'),
+    enteredCode: document.getElementById('scrambled-input')
 };
 
 
@@ -616,6 +619,59 @@ UI.transferSubmit.addEventListener('click', async () => {
     }
 
     await handleTransferRequest(amount, recipientId);
+});
+
+UI.verifyBtn.addEventListener('click', async () => {
+    const userEnteredCode = UI.enteredCode.value.trim();
+
+    if (!userEnteredCode) {
+        modernAlert("Please enter your verification code.");
+        return;
+    }
+
+    if (!/^\d+$/.test(userEnteredCode)) {
+        modernAlert("Verification code must contain numbers only.");
+        return;
+    }
+
+    if (userEnteredCode.length !== 6) {
+        modernAlert("Code must be exactly 6 digits.");
+        return;
+    }
+
+    const user = auth.currentUser;
+    const idToken = await user.getIdToken();
+
+    checkLocalStorageSecurityStatus();
+    if(!loadedKeyData) return;
+
+    fetch('https://sandbox-oypn.onrender.com/commitTransfer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ 
+            code: userEnteredCode,
+            key: loadedKeyData
+         })
+    })
+
+    .then(response => response.json())
+    .then(async data => {
+        if (data.verified) {
+            modernAlert("Verification successful! Proceeding with transfer...");
+            closeSecurityDialog();
+            const amount = parseFloat(UI.transferAmount.value);
+            const recipientId = UI.transferRecipient.value.trim();
+            await handleTransferRequest(amount, recipientId);
+        } else {
+            modernAlert("Verification failed: " + data.error);
+        }
+    })
+    .catch(error => {
+        modernAlert("Verification request failed: " + error.message);
+    });
 });
 
 

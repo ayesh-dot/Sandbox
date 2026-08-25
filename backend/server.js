@@ -42,18 +42,16 @@ app.use(async (req, res, next) => {
             return res.status(401).send({ error: "unauthorized" });
         }
     } else {
-        next();
+        return  res.status(401).send({ error: "unauthorized" });
     }
 });
 
 app.post('/initiatetransfer', async (req, res) => {
-    console.log('--------------------------------------------------');
-    console.log('📌 POST /initiatetransfer hit at:', new Date().toISOString());
-    console.log('📌 req.headers.authorization:', req.headers.authorization);
-    console.log('📌 req.body:', JSON.stringify(req.body, null, 2));
 
-    const uid = req.user?.uid || req.body.uid; 
-    console.log('🔍 Resolved UID:', uid);
+    const uid = req.user?.uid;
+    if (!uid) {
+        return res.status(401).send({ error: "unauthorized", message: "Unauthorized." });
+    }
 
     if (!uid) {
         console.warn('❌ Auth failed: No UID found on req.user or req.body');
@@ -62,28 +60,22 @@ app.post('/initiatetransfer', async (req, res) => {
 
     try {
         const { recipientEmail, transferAmount, key } = req.body;
-        console.log('📦 Extracted Payload - recipientEmail:', recipientEmail, '| transferAmount:', transferAmount, '| key object exists?', !!key);
 
         const { uniqueUUID: UUID, cipherPad, issuedAt, signature } = key || {};
-        console.log('🔑 Extracted Key Data - UUID:', UUID);
-        console.log('🔑 Extracted Key Data - cipherPad:', cipherPad);
-        console.log('🔑 Extracted Key Data - issuedAt:', issuedAt);
-        console.log('🔑 Extracted Key Data - signature:', signature);
 
         const userDoc = await admin.firestore().collection("userdata").doc(uid).get();
-        console.log('📂 User doc exists in Firestore?', userDoc.exists);
         
         if (!userDoc.exists) {
             console.warn('❌ User document not found for UID:', uid);
             return res.status(404).send({ error: "not-found", message: "User account not found." });
         }
         const userData = userDoc.data();
-        console.log('👤 Sender User Data (balance, etc.):', userData);
+        // console.log('👤 Sender User Data (balance, etc.):', userData);
 
         let recipientUserRecord;
         try {
             recipientUserRecord = await admin.auth().getUserByEmail(recipientEmail);
-            console.log('📫 Recipient Auth Record found - UID:', recipientUserRecord.uid);
+            // console.log('📫 Recipient Auth Record found - UID:', recipientUserRecord.uid);
         } catch (e) {
             console.warn('❌ getUserByEmail failed for recipientEmail:', recipientEmail, '| Error:', e.message);
             return res.status(404).send({ error: "not-found", message: "Recipient not found." });
@@ -91,7 +83,7 @@ app.post('/initiatetransfer', async (req, res) => {
 
         const recipientUid = recipientUserRecord.uid;
         const recipientDoc = await admin.firestore().collection("userdata").doc(recipientUid).get();
-        console.log('📂 Recipient userdata doc exists?', recipientDoc.exists);
+        // console.log('📂 Recipient userdata doc exists?', recipientDoc.exists);
 
         if (!recipientDoc.exists) {
             console.warn('❌ Recipient userdata document not found for UID:', recipientUid);
@@ -151,10 +143,7 @@ app.post('/initiatetransfer', async (req, res) => {
                                     .update(payloadString)
                                     .digest('hex');
 
-        console.log('🔐 Signature Comparison:');
-        console.log('   - Received signature:', signature);
-        console.log('   - Expected signature:', expectedSignature);
-        console.log('   - Payload string used:', payloadString);
+
 
         if (signature !== expectedSignature) {
             console.warn('❌ Signature mismatch detected!');
@@ -162,7 +151,7 @@ app.post('/initiatetransfer', async (req, res) => {
         }
         
         const existingSms = await admin.firestore().collection("sms").doc(uid).get();
-        console.log('📱 Existing pending SMS doc exists?', existingSms.exists);
+        // console.log('📱 Existing pending SMS doc exists?', existingSms.exists);
         if (existingSms.exists) {
             console.warn('❌ Verification request already pending for UID:', uid);
             return res.status(400).send({ error: "already-exists", message: "A verification request is already pending." });
@@ -181,7 +170,7 @@ app.post('/initiatetransfer', async (req, res) => {
         };
 
         let finalEncrypted = crypto.createHash('sha256').update(encryptedCode.join('') + UUID).digest('hex');
-        console.log('🎲 Generated verification code successfully.');
+        // console.log('🎲 Generated verification code successfully.');
 
         const expirationTime = new Date();
         expirationTime.setMinutes(expirationTime.getMinutes() + 5);
@@ -194,11 +183,11 @@ app.post('/initiatetransfer', async (req, res) => {
             expiresAt: admin.firestore.Timestamp.fromDate(expirationTime),
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
-        console.log('💾 Firestore SMS document created successfully.');
+        // console.log('💾 Firestore SMS document created successfully.');
 
         const idToken = req.headers.authorization?.split('Bearer ')[1];
         await sendCode(idToken, code.join(''));
-        console.log('📤 Verification code dispatched successfully.');
+        // console.log('📤 Verification code dispatched successfully.');
 
         return res.status(200).send({ success: true, message: "Transfer successful" });
 
@@ -353,6 +342,10 @@ function generateRandomDebitCard() {
 app.post('/create-account', async (req, res) => {
     try {
         const { firstName, lastName, dob, cvv, phone, balance, uid } = req.body;
+        const nameRegex = /^[a-zA-Z\s'-]+/;
+        if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+            return res.status(400).json({ error: "Names can only contain letters and standard characters." });
+        }
 
         // Validation check
         if (!uid || typeof uid !== 'string') {
@@ -423,3 +416,98 @@ app.post('/create-account', async (req, res) => {
 });
 
 client.login(process.env.AUTH_BOT_TOKEN);
+
+app.post('/commitTransfer', async (req, res) => {
+
+    const { code, key} = req.body;
+    if (!key) {
+        return res.status(400).json({ error: "invalid-argument", message: "Key object is required." });
+    }
+
+
+    if (!code) {
+        return res.status(400).json({ error: "Verification code is required." });
+    }
+
+    if (!/^\d+$/.test(code)) {
+        return res.status(400).json({ error: "Verification code must contain numbers only." });
+    }
+
+    if (code.length !== 6) {
+        return res.status(400).json({ error: "Code must be exactly 6 digits." });
+    }
+
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const uid = decodedToken.uid;
+    if (!uid) {
+        return res.status(401).send({ error: "unauthorized", message: "Unauthorized." });
+    }
+
+    const smsDoc = await admin.firestore().collection("sms").doc(uid).get();
+    if (!smsDoc.exists) {
+        console.warn('❌ No pending transfer found for UID:', uid);
+        return res.status(404).send({ error: "not-found", message: "No pending transfer found." });
+    }
+
+
+    const { uniqueUUID, cipherPad, issuedAt, signature } = key;
+
+    const verificationResult = await verifyKey(uniqueUUID, cipherPad, issuedAt, signature, uid);
+    if (!verificationResult.valid) {
+        return res.status(verificationResult.status).send({ error: verificationResult.error, message: verificationResult.message });
+    }
+
+    const smsData = smsDoc.data();
+    const { code: storedCode, expiresAt, recipientEmail, transferAmount } = smsData;
+
+    
+
+});
+
+async function verifyKey(UUID, cipherPad, issuedAt, signature, uid) {
+
+    // 1. Structural checks
+    if (!UUID || !signature || !cipherPad || cipherPad.length < 6) {
+        console.warn('❌ Missing or short key parameters:', { UUID: !!UUID, signature: !!signature, cipherPadLength: cipherPad?.length });
+        return { valid: false, status: 400, error: "invalid-argument", message: "Invalid key data provided." };
+    }
+
+    if (cipherPad.some(digit => typeof digit !== "number" || digit < 0 || digit > 9)) {
+        console.warn('❌ cipherPad contains invalid digits:', cipherPad);
+        return { valid: false, status: 400, error: "invalid-argument", message: "Cipher pad must contain only digits between 0 and 9." };
+    }
+
+    if (UUID.length !== 36) {
+        console.warn('❌ UUID length is not 36:', UUID?.length);
+        return { valid: false, status: 400, error: "invalid-argument", message: "UUID must be a valid 36-character string." };
+    }
+
+    // 2. Fetch private ID from Firestore
+    const doc = await admin.firestore().collection("private").doc(uid).get();
+    if (!doc.exists || !doc.data().privateId) {
+        console.warn('❌ Private ID not found for UID:', uid);
+        return { valid: false, status: 404, error: "not-found", message: "Private ID not found for user." };
+    }
+    
+    const privateId = doc.data().privateId;
+
+    // 3. Cryptographic HMAC verification
+    const payloadString = JSON.stringify({ UUID, cipherPad, issuedAt, privateId });
+    const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
+                                .update(payloadString)
+                                .digest('hex');
+
+    if (signature !== expectedSignature) {
+        console.warn('❌ Signature mismatch detected!');
+        return { valid: false, status: 401, error: "unauthenticated", message: "Invalid cryptographic signature. Key tampering or account mismatch detected." };
+    }
+
+    return { valid: true };
+}
