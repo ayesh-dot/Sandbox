@@ -215,11 +215,17 @@ createAccButton.addEventListener('click', async () => {
     try {
         console.log("Sending account package to backend...");
         
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error("User not authenticated.");
+        }
+        const token = await user.getIdToken();  
         
         const response = await fetch('https://sandbox-oypn.onrender.com/create-account', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(accountData)
         });
