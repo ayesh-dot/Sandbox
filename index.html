@@ -238,7 +238,7 @@
 
 
 
-            <label>Date of Birth</label>
+           <label>Date of Birth</label>
             <div class="dob-inputs margin10px">
                 
                 <input 
@@ -247,11 +247,11 @@
                     id="day-input" 
                     oninput="
                         if(this.value.length > 2) this.value = this.value.slice(0, 2);
-                        let m = parseInt(document.getElementById('month-input').value, 10);
-                        let y = parseInt(document.getElementById('year-input').value, 10);
-                        let max = (m && y && document.getElementById('year-input').value.length === 4) ? new Date(y, m, 0).getDate() : (m ? [31,28,31,30,31,30,31,31,30,31,30,31][m-1] : 31);
-                        if(parseInt(this.value, 10) > max) this.value = '';
-                        if(this.value <0){
+                        let mDay = parseInt(document.getElementById('month-input').value, 10);
+                        let yDay = parseInt(document.getElementById('year-input').value, 10);
+                        let maxDay = (mDay && yDay && document.getElementById('year-input').value.length === 4) ? new Date(yDay, mDay, 0).getDate() : (mDay ? [31,28,31,30,31,30,31,31,30,31,30,31][mDay-1] : 31);
+                        if(parseInt(this.value, 10) > maxDay) this.value = '';
+                        if(this.value < 0){
                             this.value = '';
                         }else if(this.value == 0){
                             this.value = 1;
@@ -266,11 +266,11 @@
                     oninput="
                         if(this.value.length > 2) this.value = this.value.slice(0, 2);
                         if(parseInt(this.value, 10) > 12) this.value = '';
-                        let d = document.getElementById('day-input');
-                        let y = parseInt(document.getElementById('year-input').value, 10);
-                        let m = parseInt(this.value, 10);
-                        let max = (m && y && document.getElementById('year-input').value.length === 4) ? new Date(y, m, 0).getDate() : (m ? [31,28,31,30,31,30,31,31,30,31,30,31][m-1] : 31);
-                        if(parseInt(d.value, 10) > max) d.value = '';
+                        let dMonth = document.getElementById('day-input');
+                        let yMonth = parseInt(document.getElementById('year-input').value, 10);
+                        let mMonth = parseInt(this.value, 10);
+                        let maxMonth = (mMonth && yMonth && document.getElementById('year-input').value.length === 4) ? new Date(yMonth, mMonth, 0).getDate() : (mMonth ? [31,28,31,30,31,30,31,31,30,31,30,31][mMonth-1] : 31);
+                        if(parseInt(dMonth.value, 10) > maxMonth) dMonth.value = '';
                         if(this.value < 0){
                             this.value = '';
                         } else if(this.value == 0){
@@ -285,12 +285,12 @@
                     id="year-input" 
                     oninput="
                         if(this.value.length > 4) this.value = this.value.slice(0, 4);
-                        let d = document.getElementById('day-input');
-                        let m = parseInt(document.getElementById('month-input').value, 10);
-                        let y = parseInt(this.value, 10);
-                        if(m && y && this.value.length === 4) {
-                            let max = new Date(y, m, 0).getDate();
-                            if(parseInt(d.value, 10) > max) d.value = '';
+                        let dYear = document.getElementById('day-input');
+                        let mYear = parseInt(document.getElementById('month-input').value, 10);
+                        let yYear = parseInt(this.value, 10);
+                        if(mYear && yYear && this.value.length === 4) {
+                            let maxYear = new Date(yYear, mYear, 0).getDate();
+                            if(parseInt(dYear.value, 10) > maxYear) dYear.value = '';
                         }
                         if(this.value > new Date().getFullYear()- 16 || this.value < 0){
                             this.value = '';
@@ -299,7 +299,7 @@
                         }
                     "
                 >
-            
+
             </div>
 
             
