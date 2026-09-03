@@ -29,6 +29,18 @@ app.use(cors({
 
 app.use(express.json());
 
+import rateLimit from 'express-rate-limit';
+
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // 50 requests per window per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests, please try again later." }
+});
+
+app.use(globalLimiter);
+
 
 // Middleware to verify ID Token
 app.use(async (req, res, next) => {
@@ -151,10 +163,23 @@ app.post('/initiatetransfer', async (req, res) => {
         }
         
         const existingSms = await admin.firestore().collection("sms").doc(uid).get();
-        // console.log('📱 Existing pending SMS doc exists?', existingSms.exists);
+
         if (existingSms.exists) {
-            console.warn('❌ Verification request already pending for UID:', uid);
-            return res.status(400).send({ error: "already-exists", message: "A verification request is already pending." });
+            const smsData = existingSms.data();
+            const expiresAt = smsData.expiresAt?.toDate();
+            const now = new Date();
+
+            // Check if the 5-minute window is still active
+            if (expiresAt && now < expiresAt) {
+                console.warn('❌ Active verification request pending for UID:', uid);
+                return res.status(429).send({ 
+                    error: "too-many-requests", 
+                    message: "Security cooldown active. Please wait for the 5-minute window to expire." 
+                });
+            } else {
+                // If it's expired, clear the stale record before generating the new one
+                await admin.firestore().collection("sms").doc(uid).delete();
+            }
         }
 
         let code = [];
