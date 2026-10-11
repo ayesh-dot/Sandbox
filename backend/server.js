@@ -492,7 +492,13 @@ app.post('/commitTransfer', async (req, res) => {
     const smsData = smsDoc.data();
     const { code: storedCode, expiresAt, recipientEmail, transferAmount } = smsData;
 
+    let splitCode = [];
     
+    for(let i = 0; i < 6; i++){
+        splitCode.push(parseInt(code[i]));
+    }
+
+    let finalEncrypted = crypto.createHash('sha256').update(encryptedCode.join('') + UUID).digest('hex');
 
 });
 
