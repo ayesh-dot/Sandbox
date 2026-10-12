@@ -194,8 +194,9 @@ app.post('/initiatetransfer', async (req, res) => {
             encryptedCode.push((code[i] + padValue) % 10);
         };
 
-        let finalEncrypted = crypto.createHash('sha256').update(encryptedCode.join('') + UUID).digest('hex');
-        // console.log('🎲 Generated verification code successfully.');
+        let finalEncrypted = crypto.createHash('sha256')
+                           .update(encryptedCode.join('') + UUID + privateId)
+                           .digest('hex');
 
         const expirationTime = new Date();
         expirationTime.setMinutes(expirationTime.getMinutes() + 5);
@@ -492,15 +493,63 @@ app.post('/commitTransfer', async (req, res) => {
     const smsData = smsDoc.data();
     const { code: storedCode, expiresAt, recipientEmail, transferAmount } = smsData;
 
-    let splitCode = [];
-    
-    for(let i = 0; i < 6; i++){
-        splitCode.push(parseInt(code[i]));
+    const splitUEC = [...code].map(Number);
+
+    let cipherPadUEC = [];
+    for (let i = 0; i < 6; i++) {
+        cipherPadUEC.push((splitUEC[i] - cipherPad[i % cipherPad.length] + 10) % 10);
     }
 
-    let finalEncrypted = crypto.createHash('sha256').update(encryptedCode.join('') + UUID).digest('hex');
+    finalUEC = [...cipherPadUEC].map(Number);
 
+    const privateIdDoc = await admin.firestore().collection("private").doc(uid).get();
+    if (!privateIdDoc.exists || !privateIdDoc.data().privateId) {
+        console.warn('❌ Private ID not found for UID:', uid);
+        return res.status(404).send({ error: "not-found", message: "Private ID not found for user." });
+    }
+    const privateId = privateIdDoc.data().privateId;
+
+    //final encrypted should be what we have in the database
+    let payloadString = JSON.stringify({finalUEC, uniqueUUID: UUID, privateId});
+
+    let finalUECHash = crypto.createHash('sha256')
+                           .update(payloadString)
+                           .digest('hex');
+
+
+    if (finalUECHash !== storedCode) {
+        console.warn('❌ Verification code mismatch for UID:', uid);
+        return res.status(401).send({ error: "unauthenticated", message: "Invalid verification code." });
+    }
+
+    const now = new Date();
+    if (expiresAt.toDate() < now) {
+        console.warn('❌ Verification code expired for UID:', uid);
+        return res.status(400).send({ error: "failed-precondition", message: "Verification code has expired." });
+    }
+
+    // #region Transfer Logic
+
+    
+
+    // #endregion
 });
+
+async function setBalance(uid, newBalance) {
+    const userDocRef = admin.firestore().collection("userdata").doc(uid);
+    await userDocRef.update({ balance: newBalance });
+}
+
+//TODO: replace generic code with personalized code for each user.
+async function addTransactionLog(senderUid, recipientUid, amount) {
+    const transactionLogRef = admin.firestore().collection("transactions").doc();
+    await transactionLogRef.set({
+        senderEmail: (await admin.auth().getUser(senderUid)).email,
+        recipientEmail: (await admin.auth().getUser(recipientUid)).email,
+        amount,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+    });
+}
 
 async function verifyKey(UUID, cipherPad, issuedAt, signature, uid) {
 
