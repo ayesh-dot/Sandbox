@@ -530,8 +530,32 @@ app.post('/commitTransfer', async (req, res) => {
 
     // #region Transfer Logic
 
-    
+    const recepientUid = (await admin.auth().getUserByEmail(recipientEmail)).uid;
 
+    const senderDoc = await admin.firestore().collection("userdata").doc(uid).get();
+    const recipientDoc = await admin.firestore().collection("userdata").doc(recepientUid).get();
+
+    if (!senderDoc.exists || !recipientDoc.exists) {
+        console.warn('❌ Sender or recipient userdata document not found.');
+        return res.status(404).send({ error: "not-found", message: "Sender or recipient account not found." });
+    }
+
+    const senderData = senderDoc.data();
+    const recipientData = recipientDoc.data();
+    
+    if (senderData.balance < transferAmount) {
+        console.warn(`❌ Insufficient funds: Sender balance (${senderData.balance}) < transferAmount (${transferAmount})`);
+        return res.status(400).send({ error: "failed-precondition", message: "Insufficient funds for this transfer." });
+    }
+
+    await setBalance(uid, senderData.balance - transferAmount);
+    await setBalance(recepientUid, recipientData.balance + transferAmount);
+
+    await addTransactionLog(uid, recepientUid, transferAmount);
+
+    //await admin.firestore().collection("sms").doc(uid).delete();
+
+    return res.status(200).send({ success: true, message: "Transfer completed successfully." });
     // #endregion
 });
 
