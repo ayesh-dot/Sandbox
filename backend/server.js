@@ -603,7 +603,7 @@ async function verifyKey(UUID, cipherPad, issuedAt, signature, uid) {
     const privateId = doc.data().privateId;
 
     // 3. Cryptographic HMAC verification
-    const payloadString = JSON.stringify({ UUID, cipherPad, issuedAt, privateId });
+    const payloadString = JSON.stringify({ uniqueUUID: UUID, cipherPad, issuedAt, privateId });
     const expectedSignature = crypto.createHmac('sha256', process.env.PRIVATE_VERIFICATION_KEY)
                                 .update(payloadString)
                                 .digest('hex');
