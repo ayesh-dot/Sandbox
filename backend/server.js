@@ -515,17 +515,20 @@ app.post('/commitTransfer', async (req, res) => {
 
     const payloadString = finalUECString + uniqueUUID + privateId;
 
+    const payloadPreHash = payloadString;
+
 
     let finalUECHash = crypto.createHash('sha256')
                          .update(payloadString)
                          .digest('hex');
 
     console.log(" HASH DEBUGGING:", {
-    stringToHash: payloadString,
-    finalUECString,
-    uniqueUUID,
-    privateId
-});
+        stringToHash: payloadString,
+        finalUECString,
+        uniqueUUID,
+        privateId,
+        payloadPreHash
+    });
 
 
     if (finalUECHash !== storedCode) {
