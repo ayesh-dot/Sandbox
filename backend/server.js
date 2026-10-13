@@ -500,7 +500,7 @@ app.post('/commitTransfer', async (req, res) => {
         cipherPadUEC.push((splitUEC[i] - cipherPad[i % cipherPad.length] + 10) % 10);
     }
 
-    finalUEC = [...cipherPadUEC].map(Number);
+    const finalUEC = [...cipherPadUEC].map(Number);
 
     const privateIdDoc = await admin.firestore().collection("private").doc(uid).get();
     if (!privateIdDoc.exists || !privateIdDoc.data().privateId) {
