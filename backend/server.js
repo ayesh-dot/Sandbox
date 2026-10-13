@@ -46,6 +46,11 @@ app.use(globalLimiter);
 
 // Middleware to verify ID Token
 app.use(async (req, res, next) => {
+
+    if (req.path === '/login' || req.path === '/callback' || req.path === '/favicon.ico') {
+        return next();
+    }
+
     const idToken = req.headers.authorization?.split('Bearer ')[1];
     if (idToken) {
         try {
@@ -53,10 +58,10 @@ app.use(async (req, res, next) => {
             req.user = decodedToken;
             next();
         } catch (e) {
-            return res.status(401).send({ error: "unauthorized testtestetst" });
+            return res.status(401).send({ error: "unauthorized via middleware" });
         }
     } else {
-        return  res.status(401).send({ error: "unauthorized testestest" });
+        return  res.status(401).send({ error: "unauthorized via middleware" });
     }
 });
 
