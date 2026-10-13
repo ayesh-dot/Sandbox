@@ -21,6 +21,8 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
     origin: 'http://localhost:5500', // Or specify the origin of your frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -51,7 +53,7 @@ app.use(async (req, res, next) => {
             req.user = decodedToken;
             next();
         } catch (e) {
-            return res.status(401).send({ error: "unauthorized" });
+            return res.status(401).send({ error: "unauthorized testtestetst" });
         }
     } else {
         return  res.status(401).send({ error: "unauthorized" });
