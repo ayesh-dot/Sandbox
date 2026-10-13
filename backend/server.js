@@ -510,11 +510,15 @@ app.post('/commitTransfer', async (req, res) => {
     const privateId = privateIdDoc.data().privateId;
 
     //final encrypted should be what we have in the database
-    let payloadString = JSON.stringify({finalUEC, uniqueUUID, privateId});
+    
+    const finalUECString = finalUEC.join('');
+
+    const payloadString = finalUECString + uniqueUUID + privateId;
+
 
     let finalUECHash = crypto.createHash('sha256')
-                           .update(payloadString)
-                           .digest('hex');
+                         .update(payloadString)
+                         .digest('hex');
 
 
     if (finalUECHash !== storedCode) {
