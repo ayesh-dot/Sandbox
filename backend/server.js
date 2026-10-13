@@ -520,6 +520,11 @@ app.post('/commitTransfer', async (req, res) => {
                          .update(payloadString)
                          .digest('hex');
 
+    console.log(" Comparing Hashes:", {
+        computed: finalUECHash,
+        expectedStored: storedCode
+    });
+
 
     if (finalUECHash !== storedCode) {
         console.warn('❌ Verification code mismatch for UID:', uid);
