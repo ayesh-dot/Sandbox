@@ -278,8 +278,23 @@ app.get('/callback', async (req, res) => {
 
         const discordUser = await oauth.getUser(tokenData.access_token);
 
+        //TEMP CHECK
+
+        const tempDocRef = db.collection('discordtemp').doc(discordUser.id);
+        const existingDoc = await tempDocRef.get();
+
+        let tempExisting = false;
+
+        if (existingDoc.exists) {
+            tempExisting = true;
+            await tempDocRef.delete();
+        }
+
+        //END TEMP CHECK
+
         await db.collection('discord').doc(firestoreUid).set({
-            discordId: discordUser.id
+            discordId: discordUser.id,
+            activated: tempExisting
         }, { merge: true });
 
         res.send('Account linked successfully!');
@@ -338,7 +353,8 @@ if (!admin.apps.length) {
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
-        GatewayIntentBits.DirectMessages // Required to send DMs
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.GuildMembers
     ] 
 });
 
@@ -631,3 +647,45 @@ async function verifyKey(UUID, cipherPad, issuedAt, signature, uid) {
 
     return { valid: true };
 }
+
+
+client.on('guildMemberAdd', async (member) => {
+    try {
+        const userQuery = await db.collection('discord')
+            .where('discordId', '==', member.id)
+            .get();
+
+        const isVerified = !userQuery.empty && userQuery.docs[0].data().activated === true;
+
+        if (!isVerified) {
+            await db.collection('discordtemp').doc(member.id).set({
+                joinedAt: new Date()
+            });
+            console.log(`[Join] Unverified user ${member.user.tag} added to discordtemp.`);
+        } else {
+            console.log(`[Join] Already verified user ${member.user.tag} joined.`);
+        }
+    } catch (error) {
+        console.error('Error in guildMemberAdd:', error);
+    }
+});
+
+client.on('guildMemberRemove', async (member) => {
+    try {
+        await db.collection('discordtemp').doc(member.id).delete().catch(() => {});
+
+        const userQuery = await db.collection('discord')
+            .where('discordId', '==', member.id)
+            .get();
+
+        if (!userQuery.empty) {
+            const docId = userQuery.docs[0].id;
+            await db.collection('discord').doc(docId).update({
+                activated: false,
+            });
+            console.log(`[Leave] User ${member.user.tag} left. Reset activation status.`);
+        }
+    } catch (error) {
+        console.error('Error in guildMemberRemove:', error);
+    }
+});
