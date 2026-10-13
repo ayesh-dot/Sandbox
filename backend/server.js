@@ -520,10 +520,12 @@ app.post('/commitTransfer', async (req, res) => {
                          .update(payloadString)
                          .digest('hex');
 
-    console.log(" Comparing Hashes:", {
-        computed: finalUECHash,
-        expectedStored: storedCode
-    });
+    console.log(" HASH DEBUGGING:", {
+    stringToHash: payloadString,
+    finalUECString,
+    uniqueUUID,
+    privateId
+});
 
 
     if (finalUECHash !== storedCode) {
