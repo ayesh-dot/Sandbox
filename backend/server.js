@@ -497,7 +497,7 @@ app.post('/commitTransfer', async (req, res) => {
 
     let cipherPadUEC = [];
     for (let i = 0; i < 6; i++) {
-        cipherPadUEC.push((splitUEC[i] - cipherPad[i % cipherPad.length] + 10) % 10);
+        cipherPadUEC.push((splitUEC[i] + cipherPad[i % cipherPad.length]) % 10);
     }
 
     const finalUEC = [...cipherPadUEC].map(Number);
@@ -527,7 +527,9 @@ app.post('/commitTransfer', async (req, res) => {
         finalUECString,
         uniqueUUID,
         privateId,
-        payloadPreHash
+        payloadPreHash,
+        finalUECString,
+        finalUECHash
     });
 
 
