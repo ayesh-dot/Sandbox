@@ -522,17 +522,6 @@ app.post('/commitTransfer', async (req, res) => {
                          .update(payloadString)
                          .digest('hex');
 
-    console.log(" HASH DEBUGGING:", {
-        stringToHash: payloadString,
-        finalUECString,
-        uniqueUUID,
-        privateId,
-        payloadPreHash,
-        finalUECString,
-        finalUECHash
-    });
-
-
     if (finalUECHash !== storedCode) {
         console.warn('❌ Verification code mismatch for UID:', uid);
         return res.status(401).send({ error: "unauthenticated", message: "Invalid verification code." });
@@ -567,9 +556,9 @@ app.post('/commitTransfer', async (req, res) => {
     await setBalance(uid, senderData.balance - transferAmount);
     await setBalance(recepientUid, recipientData.balance + transferAmount);
 
-    await addTransactionLog(uid, recepientUid, transferAmount);
+    //await addTransactionLog(uid, recepientUid, transferAmount);
 
-    //await admin.firestore().collection("sms").doc(uid).delete();
+    await admin.firestore().collection("sms").doc(uid).delete();
 
     return res.status(200).send({ success: true, message: "Transfer completed successfully." });
     // #endregion
