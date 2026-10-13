@@ -201,6 +201,10 @@ app.post('/initiatetransfer', async (req, res) => {
         const expirationTime = new Date();
         expirationTime.setMinutes(expirationTime.getMinutes() + 5);
 
+        if (Math.round(transferAmount * 100) !== transferAmount * 100 || transferAmount <= 0) {
+            return res.status(400).send({ error: "invalid-amount", message: "Transfer amount must be in valid cent increments." });
+        }
+
         await admin.firestore().collection("sms").doc(uid).set({
             code: finalEncrypted,
             senderUid: uid,
